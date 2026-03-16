@@ -2,9 +2,9 @@ import os
 import cv2
 import numpy as np
 import pickle
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.svm import SVC
 
 dataset_path = r"D:\Coding\MSE35HN\MLE501\data_cleaned"
 
@@ -35,8 +35,7 @@ for label in labels:
             # normalize về 0-1
             img = img / 255.0
 
-            # flatten 2D -> 1D
-            feature_vector = img.flatten()
+            feature_vector = np.sum(img, axis=0)
 
             X.append(feature_vector)
             y.append(label)
@@ -53,24 +52,20 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # train model
-model = LogisticRegression(
-    max_iter=2000,
-    solver="lbfgs"
-)
+# model = SVC(kernel="linear")
+model = SVC(kernel="rbf", C=10)
 
 model.fit(X_train, y_train)
 
 # predict
 y_pred = model.predict(X_test)
 
-# predict probability
-y_proba = model.predict_proba(X_test)
 
 # save model
-with open("omr_model_logistic_no_sum.pkl", "wb") as f:
+with open("omr_model_svm_sum.pkl", "wb") as f:
     pickle.dump(model, f)
 
-print("Model saved: omr_model_logistic_no_sum.pkl")
+print("Model saved: omr_model_svm_sum.pkl")
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print(classification_report(y_test, y_pred, target_names=["A","B","C","D","Blank"]))

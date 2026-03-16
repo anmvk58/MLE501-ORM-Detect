@@ -8,7 +8,7 @@ resize_width = 60
 resize_height = 15
 
 # load model
-with open("omr_model.pkl", "rb") as f:
+with open("omr_model_svm_no_sum.pkl", "rb") as f:
     model = pickle.load(f)
 
 def predict_image(image_path):
@@ -18,6 +18,7 @@ def predict_image(image_path):
     feature = pre_processing_to_test(img)
 
     prediction = model.predict(feature)
+    print(model.predict_proba(feature)[0])
 
     return prediction[0]
 
@@ -25,6 +26,7 @@ def predict_image(image_path):
 # result = predict_image("D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\A\cau_001_A_000.png")
 # result = predict_image("D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\B\cau_001_B_015.png")
 # result = predict_image("D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\C\cau_001_C_014.png")
-result = predict_image("D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\D\cau_001_D_038.png")
+# result = predict_image("D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\D\cau_001_D_038.png")
+result = predict_image("D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\Blank\cau_001_blank_015.png")
 
 print("Predicted answer:", result)

@@ -5,8 +5,9 @@ import pickle
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.multiclass import OneVsRestClassifier
 
-dataset_path = r"D:\Coding\MSE35HN\MLE501\data_cleaned"
+dataset_path = r"D:\Coding\MSE35HN\MLE501\data_cleaned_2"
 
 X = []
 y = []
@@ -23,7 +24,6 @@ for label in labels:
     for filename in os.listdir(folder):
 
         if filename.endswith(".png"):
-
             file_path = os.path.join(folder, filename)
 
             # đọc ảnh grayscale
@@ -35,27 +35,29 @@ for label in labels:
             # normalize về 0-1
             img = img / 255.0
 
-            # flatten 2D -> 1D
-            feature_vector = img.flatten()
+            feature_vector = np.mean(img, axis=0)
 
             X.append(feature_vector)
-            y.append(label)
+
+            one_hot = [0, 0, 0, 0, 0]
+            one_hot[labels.index(label)] = 1
+
+            y.append(one_hot)
 
 X = np.array(X)
 y = np.array(y)
 
 print("Dataset shape:", X.shape)
-print("Labels:", np.unique(y))
+print("Labels:", y.shape)
 
 # chia train/test
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y, test_size=0.2, random_state=42, stratify=np.argmax(y, axis=1)
 )
 
 # train model
-model = LogisticRegression(
-    max_iter=2000,
-    solver="lbfgs"
+model = OneVsRestClassifier(
+    LogisticRegression(max_iter=2000, solver="lbfgs")
 )
 
 model.fit(X_train, y_train)
@@ -63,14 +65,11 @@ model.fit(X_train, y_train)
 # predict
 y_pred = model.predict(X_test)
 
-# predict probability
-y_proba = model.predict_proba(X_test)
-
 # save model
-with open("omr_model_logistic_no_sum.pkl", "wb") as f:
+with open("omr_model.pkl", "wb") as f:
     pickle.dump(model, f)
 
-print("Model saved: omr_model_logistic_no_sum.pkl")
+print("Model saved: omr_model.pkl")
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print(classification_report(y_test, y_pred, target_names=["A","B","C","D","Blank"]))

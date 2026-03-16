@@ -35,8 +35,7 @@ for label in labels:
             # normalize về 0-1
             img = img / 255.0
 
-            # flatten 2D -> 1D
-            feature_vector = img.flatten()
+            feature_vector = np.mean(img, axis=0)
 
             X.append(feature_vector)
             y.append(label)
@@ -67,10 +66,10 @@ y_pred = model.predict(X_test)
 y_proba = model.predict_proba(X_test)
 
 # save model
-with open("omr_model_logistic_no_sum.pkl", "wb") as f:
+with open("omr_model_logistic_sum.pkl", "wb") as f:
     pickle.dump(model, f)
 
-print("Model saved: omr_model_logistic_no_sum.pkl")
+print("Model saved: omr_model_logistic_sum.pkl")
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print(classification_report(y_test, y_pred, target_names=["A","B","C","D","Blank"]))

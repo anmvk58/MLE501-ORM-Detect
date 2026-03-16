@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pytesseract
+from scipy.signal import wiener
 
 THRESHOLD_RATIO = 0.60
 RESIZE_WIDTH = 60
@@ -15,6 +16,7 @@ def convert_img_to_bw(img):
     """
     # convert to grayscale
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # denoised = cv2.GaussianBlur(gray_img, (5, 5), 1)
 
     # threshold to split black and white part
     thresh_img = cv2.threshold(
@@ -23,7 +25,20 @@ def convert_img_to_bw(img):
         255,
         cv2.THRESH_BINARY_INV
     )[1]
-    # cv2.imshow("thresh_hold", thresh_img)
+
+    # thresh_img = cv2.adaptiveThreshold(
+    #     denoised,
+    #     255,
+    #     cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+    #     cv2.THRESH_BINARY_INV,
+    #     11,
+    #     2
+    # )
+
+    # kernel = np.ones((3, 3), np.uint8)
+    # bw_clean = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel)
+    #
+    # cv2.imshow("thresh_hold", bw_clean)
     return thresh_img
 
 
@@ -121,6 +136,17 @@ def remove_and_get_number_question(thresh_img):
     answer_img = remove_side_margin(rmv_margin[:, cut_x:])
 
     return number_img, answer_img
+
+
+def pre_processing_to_view(img):
+    # denoised_img = denoise_rayleigh(img)
+    thresh_img = convert_img_to_bw(img)
+    cropped_img = remove_vertical_line(thresh_img)
+    clean_img = remove_horizontal_lines(cropped_img)
+
+    # get result
+    number_img, answer_img = remove_and_get_number_question(clean_img)
+    return answer_img, number_img
 
 
 def pre_processing_to_test(img):

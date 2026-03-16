@@ -4,9 +4,11 @@ import cv2
 from standard.image_process import convert_img_to_bw, remove_vertical_line, remove_and_get_number_question, \
     remove_horizontal_lines
 
-DATA_PATH = r"D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\D"
+DATA_PATH = "D:\Coding\MSE35HN\MLE501\dataset_tracnghiem\{LABEL}"
 
-SAVE_PATH = r"D:\Coding\MSE35HN\MLE501\data_cleaned\D"
+SAVE_PATH = "D:\Coding\MSE35HN\MLE501\data_cleaned\{LABEL}"
+
+LABEL = ['A', 'B', 'C', 'D', 'Blank']
 
 def process_one_image(img_path, save_path):
     try:
@@ -22,11 +24,12 @@ def process_one_image(img_path, save_path):
         print(f"Error: {e}")
 
 if __name__ == '__main__':
-    for filename in os.listdir(DATA_PATH):
-        if filename.endswith(".png"):
-            file_path = os.path.join(DATA_PATH, filename)
-            save_path = os.path.join(SAVE_PATH, 'train_' + filename)
-            process_one_image(img_path=file_path, save_path=save_path)
-    # process_one_image('D:\Coding\MSE35HN\MLE501\orm_detect\cau_120_A_018.png', 'test.png')
-    # process_one_image('D:\Coding\MSE35HN\MLE501\orm_detect\cau_120_A_018.png', 'test.png')
+    for label in LABEL:
+        for filename in os.listdir(DATA_PATH.format(LABEL=label)):
+            if filename.endswith(".png"):
+                file_path = os.path.join(DATA_PATH.format(LABEL=label), filename)
+                save_path = os.path.join(SAVE_PATH.format(LABEL=label), 'train_' + filename)
+                process_one_image(img_path=file_path, save_path=save_path)
+        # process_one_image('D:\Coding\MSE35HN\MLE501\orm_detect\cau_120_A_018.png', 'test.png')
+        # process_one_image('D:\Coding\MSE35HN\MLE501\orm_detect\cau_120_A_018.png', 'test.png')
 

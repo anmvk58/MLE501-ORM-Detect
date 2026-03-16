@@ -2,11 +2,9 @@ import os
 import cv2
 import numpy as np
 import pickle
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
-
-from standard.train_model_logistic import feature_vector
+from sklearn.svm import SVC
 
 dataset_path = r"D:\Coding\MSE35HN\MLE501\data_cleaned"
 
@@ -16,7 +14,7 @@ y = []
 resize_width = 60
 resize_height = 15
 
-labels = ["A", "B", "C", "D"]
+labels = ["A", "B", "C", "D", "Blank"]
 
 for label in labels:
 
@@ -37,7 +35,8 @@ for label in labels:
             # normalize về 0-1
             img = img / 255.0
 
-            feature_vector = np.mean(img, axis=0)
+            # flatten 2D -> 1D
+            feature_vector = img.flatten()
 
             X.append(feature_vector)
             y.append(label)
@@ -54,7 +53,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # train model
-model = LogisticRegression(max_iter=2000)
+# model = SVC(kernel="linear")
+model = SVC(kernel="rbf", C=10)
 
 model.fit(X_train, y_train)
 
@@ -62,12 +62,12 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
 # save model
-with open("omr_model_logistic_sum_feature.pkl", "wb") as f:
+with open("omr_model_svm_no_sum_no_probability.pkl", "wb") as f:
     pickle.dump(model, f)
 
-print("Model saved: omr_model_logistic_sum_feature.pkl")
+print("Model saved: omr_model_svm_no_sum_no_probability.pkl")
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
-print(classification_report(y_test, y_pred))
+print(classification_report(y_test, y_pred, target_names=["A","B","C","D","Blank"]))
 print("Train accuracy:", model.score(X_train, y_train))
 print("Test accuracy:", model.score(X_test, y_test))
